@@ -1,0 +1,2 @@
+terrain_key,rung,armor,recon,fires,red_coa,p_win,p_win_var,blue_loss_frac,blue_loss_frac_var,red_loss_frac,red_loss_frac_var,minutes,minutes_var,blue_hit_lt500,blue_hit_lt500_var,red_hit_lt500,red_hit_lt500_var,blue_kill_per_hit,blue_kill_per_hit_var,red_kill_per_hit,red_kill_per_hit_var
+t0,1,Maneuver,False,False,Early,0.45,0.0004,0.55,0.0004,0.51,0.0004,1.1,0.002,0.85,0.001,0.95,0.001,0.70,0.002,0.48,0.002
