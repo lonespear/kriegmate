@@ -8,6 +8,7 @@ import altair as alt
 import numpy as np
 import pandas as pd
 import pydeck as pdk
+from pydeck.types import String
 import streamlit as st
 from PIL import Image
 
@@ -227,7 +228,7 @@ def view_state():
 
 def make_deck(layers):
     w, s, e, n = t.bounds_lonlat()
-    base = pdk.Layer("BitmapLayer", data=None, image=terrain_png(t, st.session_state.terrain_version),
+    base = pdk.Layer("BitmapLayer", data=None, image=String(terrain_png(t, st.session_state.terrain_version)),
                      bounds=[w, s, e, n], opacity=0.9)
     return pdk.Deck(layers=[base] + layers, initial_view_state=view_state(),
                     map_provider="carto", map_style="light", tooltip={"text": "{tip}"})
