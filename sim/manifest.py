@@ -16,14 +16,22 @@ def _pkg_root():
     return os.path.dirname(os.path.abspath(__file__))
 
 
+SOURCE_PATHS = ["sim", "scripts", "app.py", "app_brigade.py", "requirements-lock.txt"]
+
+
 def code_version():
-    """Git commit if the package lives in a repository, else a hash of the source files."""
+    """Git commit if the package lives in a repository, else a hash of the source files.
+
+    "+dirty" means the *source* differs from the commit. Untracked files and changes to
+    result artifacts under runs/ are ignored, so regenerating a committed artifact does not
+    make the manifest claim the code was modified.
+    """
     root = os.path.dirname(_pkg_root())
     try:
         sha = subprocess.check_output(["git", "-C", root, "rev-parse", "--short", "HEAD"],
                                       stderr=subprocess.DEVNULL, text=True).strip()
-        dirty = subprocess.check_output(["git", "-C", root, "status", "--porcelain"],
-                                        stderr=subprocess.DEVNULL, text=True).strip() != ""
+        dirty = subprocess.check_output(["git", "-C", root, "status", "--porcelain", "-uno", "--"]
+                                        + SOURCE_PATHS, stderr=subprocess.DEVNULL, text=True).strip() != ""
         return f"git:{sha}{'+dirty' if dirty else ''}"
     except Exception:
         h = hashlib.sha1()
