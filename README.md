@@ -77,12 +77,12 @@ engine (rung 5, below). It is not Lanchester either.
 | Claim | Evidence | Status |
 |---|---|---|
 | Hit probability is the circular-normal (Rayleigh) probability of hitting a target of area *A* | `test_hit_prob_matches_brute_force` | **verified** |
-| Per-tick probabilities rescale correctly as 1 − (1 − p)^f | `test_tick_rescaling` | **verified** |
-| Wilson intervals hold their nominal coverage | `test_stats.py` coverage test | **verified** |
-| Kim–Nelson selects the best of four known Gaussian systems | `test_stats.py` | **verified** |
-| Kaplan–Meier and Aalen–Johansen recover exponential truths under censoring | `test_stats.py` | **verified** |
-| GP metamodel + Sobol recover a known additive function | `test_calibration.py` | **verified** |
-| History matching retains a hidden synthetic truth and shrinks the NROY volume | `test_calibration.py` | **verified** |
+| Per-tick probabilities rescale correctly as 1 − (1 − p)^f | `test_tick_rescaling_keeps_units_sane` | **verified** |
+| Wilson intervals hold their nominal coverage | `test_wilson_inside_unit_interval_and_covers` | **verified** |
+| Kim–Nelson selects the best of four known Gaussian systems | `test_kn_selects_best_system` | **verified** |
+| Kaplan–Meier and Aalen–Johansen recover exponential truths under censoring | `test_kaplan_meier_exponential`, `test_aalen_johansen_competing_exponentials` | **verified** |
+| GP metamodel + Sobol recover a known additive function | `test_metamodel_and_sobol_on_known_function` | **verified** |
+| History matching retains a hidden synthetic truth and shrinks the NROY volume | `test_history_match_keeps_truth_and_shrinks` | **verified** |
 | Common random numbers reduce variance in a real paired comparison | `runs/headline.json` (ρ = 0.50, variance ratio 0.499) | **verified** |
 | Discretization: 15 s ticks are not converged; 7.5 s and 3.75 s agree at 25 m cells | `runs/convergence.json` | **verified** |
 | The aggregate engine, corrected, tracks the entity engine to ≈0.01 in loss fractions | `data/aggregation_correction.json` | **verified against the entity engine only** |
@@ -126,7 +126,7 @@ demo ground). Regenerated at commit `325b74d`; committed as
   touching. A finer grid needs a finer tick.
 - *Cell size.* P(win) differs by **0.169** at 7.5 s (0.698 vs 0.529) and **0.135** at 3.75 s
   (0.702 vs 0.567) between 25 m and 12.5 m cells, with non-overlapping intervals at every tick
-  length. Halving the cell costs Blue roughly 0.7 of a vehicle. This is the **largest single
+  length. Halving the cell also costs Blue 0.6–0.7 of a vehicle at those ticks. This is the **largest single
   numerical artifact in the model** — larger than the SBF-vs-Maneuver effect the simulation is
   built to measure, and larger than the tick effect at the converged tick. The mechanism is line-of-sight
   sampling: a finer grid resolves small terrain features that break sight lines, so Blue is

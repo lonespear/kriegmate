@@ -52,7 +52,9 @@ sim/
   brigade.py              aggregate brigade engine: coarse ground, company entities, plans, fires, C2
   c2.py                   command-and-control profiles, decision graphs, latency, lineages (Artesh / IRGC)
 scripts/
+  headline.py             the README's worked result: one paired COA comparison with CRN
   convergence.py          tick/cell convergence sweep
+  brigade_table.py        the six-pairing brigade table, every rate with an interval
   calibrate_ladder.py     climb the ladder on a sampled terrain library, write a report
   doe_sobol.py            sensitivity analysis for one rung
   compare_coas.py         ranking-and-selection over Blue COAs with a Red-plan outer loop
@@ -66,7 +68,10 @@ tests/                    pytest suite (engine, statistics, calibration, headles
 data/reference_template.csv   column schema for real reference outcomes
 notebooks/                the earlier lane-model notebook (no terrain), kept for the derivations
 cache/terrains/           (created at run time) terrain library with descriptors and fetch dates
-runs/                     (created at run time) calibration and script outputs
+runs/                     committed result artifacts (headline, convergence, sobol_rung1,
+                          brigade_table) plus their manifests; scripts write new outputs here
+docs/                     technical-reference.md and appendix-a-methodology.md
+requirements-lock.txt     exact versions the committed artifacts were produced with
 ```
 
 Data flow: `terrain.py` produces a `Terrain`; `scenario.py` turns it and a `ScenarioConfig` into
@@ -651,7 +656,7 @@ touching): a finer grid needs a finer tick.
 
 **Cell size is not converged.** P(win) differs by 0.169 at 7.5 s and 0.135 at 3.75 s between
 25 m and 12.5 m cells, with non-overlapping intervals at every tick length; Blue losses differ by
-about 0.7 of a vehicle. This is the largest single numerical artifact in the model - larger than
+0.6–0.7 of a vehicle. This is the largest single numerical artifact in the model - larger than
 the effects the simulation is built to measure. The mechanism is line-of-sight sampling: a finer
 grid resolves small terrain features that break sight lines. Consequence: absolute probabilities
 from this model are cell-size artifacts as much as they are model outputs, and paired comparisons
