@@ -89,10 +89,12 @@ engine (rung 5, below). It is not Lanchester either.
 | Any parameter value, nation catalog, C2 profile, or resulting P(win) | — | **not validated — notional** |
 | Any statement about a real weapon system, unit, or army | — | **out of scope — do not quote** |
 
-`python -m pytest -q` → **46 passed** (2026-09-18, Python 3.13, `requirements-lock.txt`).
-The full suite took 9 min 21 s on a laptop under load; the engine and statistics subsets
-(`tests/test_sim.py tests/test_stats.py tests/test_calibration.py`) take about 75 s. The two
-Streamlit app suites dominate the runtime.
+`pytest tests/test_sim.py tests/test_stats.py tests/test_calibration.py tests/test_brigade.py`
+→ **43 passed in 10 min 55 s** (2026-09-18, Python 3.13, `requirements-lock.txt`). That is the
+suite behind every claim in the table above: the engine, the estimators, the calibration
+machinery and the brigade engine. The full `pytest -q` adds four headless Streamlit app tests
+(47 collected) and ran 46 passed / 0 failed in 9 min 21 s earlier the same day, before the
+pydeck-serialization regression test was added.
 
 ---
 

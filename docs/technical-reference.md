@@ -764,11 +764,17 @@ and a multi-plan run.
 
 ## 14. Tests
 
-`python -m pytest -q` → **46 passed** (2026-09-18, Python 3.13, `requirements-lock.txt`;
-9 min 21 s on a laptop under load). The engine/statistics/calibration subset
-(`pytest tests/test_sim.py tests/test_stats.py tests/test_calibration.py`) takes about 75 s;
-the two Streamlit app suites account for nearly all of the rest. `pytest.ini` sets
-`pythonpath = .`.
+`python -m pytest -q` collects **47 tests**. Measured on 2026-09-18 (Python 3.13,
+`requirements-lock.txt`, laptop under load):
+
+- `pytest tests/test_sim.py tests/test_stats.py tests/test_calibration.py tests/test_brigade.py`
+  → **43 passed in 10 min 55 s**. This is the simulation and statistics suite; it backs every
+  verified claim in the README.
+- `pytest -q` earlier the same day → **46 passed in 9 min 21 s**, before
+  `tests/test_deck_json.py` was added. The four headless Streamlit app tests dominate the
+  wall-clock time.
+
+`pytest.ini` sets `pythonpath = .`.
 
 | File | What it checks |
 |---|---|
