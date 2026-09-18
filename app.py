@@ -16,8 +16,9 @@ from sim import stats
 from sim.engine import TICK_DEFAULT, concat_results, simulate
 from sim.manifest import make_manifest
 from sim.scenario import Scenario, ScenarioConfig
+from sim.symbols import atlas, geometry as sym_geometry, strike as sym_strike, symbol_name
 from sim.terrain import CLASS_NAMES, demo_terrain, geocode, osm_terrain
-from sim.units import (COMPANY, TANK, B_LABELS, BTYPE, IS_INF, IS_SCOUT, NB, NR, R_LABELS, RTYPE,
+from sim.units import (COMPANY, IFV, INF, R_AT, R_INF, SCOUT, TANK, B_LABELS, BTYPE, IS_INF, IS_SCOUT, NB, NR, R_LABELS, RTYPE,
                        TYPE_NAMES, default_params)
 
 st.set_page_config(page_title="Company-team attack on real ground", page_icon="🗺️", layout="wide")
@@ -41,6 +42,8 @@ h1 { font-weight: 700 !important; font-size: 2.2rem !important; padding-bottom: 
 .lede { color: #4A544B; max-width: 72ch; margin: .1rem 0 1rem; line-height: 1.5; }
 .key { display: inline-flex; align-items: center; gap: .35rem; margin-right: 1.1rem; font-size: .92rem; }
 .swatch { width: .8rem; height: .8rem; border-radius: 50%; display: inline-block; }
+.sym { width: 32px; height: 32px; display: inline-block; vertical-align: middle;
+       background-size: auto 32px; background-repeat: no-repeat; margin-right: .15rem; }
 .ring { width: .8rem; height: .8rem; border-radius: 50%; display: inline-block; border: 2px solid rgb(217,154,0); }
 .clock { font-family: 'Barlow Condensed', sans-serif; font-size: 1.7rem; font-weight: 600;
          font-variant-numeric: tabular-nums; line-height: 1.1; }
@@ -259,6 +262,52 @@ def make_deck(layers):
                     map_provider="carto", map_style="light", tooltip={"text": "{tip}"})
 
 
+SYMBOL_PX = 17            # nominal symbol size on screen at the fitted zoom
+
+
+def symbol_size_m():
+    """Symbol edge in metres, sized so it reads at about SYMBOL_PX at the default view."""
+    return 2 * focus_box()[2] / PANE_PX * SYMBOL_PX
+
+
+def symbols(units, name):
+    """APP-6 style unit symbols drawn as map geometry.
+
+    Each unit is a dict with xy (local metres), btype, hostile, dead, unseen and tip. The frame
+    carries affiliation and the marks carry type, matching sim.symbols.
+    """
+    size = symbol_size_m()
+    frames, marks = [], []
+    for u in units:
+        x, y = float(u["xy"][0]), float(u["xy"][1])
+        dead, unseen = u.get("dead", False), u.get("unseen", False)
+        edge = (DEAD if dead else (HOSTILE if u["hostile"] else FRIEND)) + [110 if unseen else 255]
+        frame, mk = sym_geometry(u["btype"], u["hostile"], size)
+        frames.append({"poly": to_lonlat(np.array([(x + a, y + b) for a, b in frame])).tolist(),
+                       "edge": edge, "fill": [255, 255, 255, 90 if unseen else (200 if dead else 235)],
+                       "tip": u["tip"]})
+        if dead:
+            mk = [sym_strike(size)]
+        for line in mk:
+            marks.append({"path": to_lonlat(np.array([(x + a, y + b) for a, b in line])).tolist(),
+                          "edge": edge, "tip": u["tip"]})
+    return [
+        pdk.Layer("PolygonLayer", data=frames, id=f"{name}_frame", get_polygon="poly",
+                  get_fill_color="fill", get_line_color="edge", stroked=True, filled=True,
+                  line_width_min_pixels=2, get_line_width=size * 0.07, pickable=True),
+        pdk.Layer("PathLayer", data=marks, id=f"{name}_mark", get_path="path", get_color="edge",
+                  get_width=size * 0.07, width_min_pixels=2, pickable=True),
+    ]
+
+
+def symbol_img(btype, hostile, **state):
+    """One symbol as an <img> for the HTML legend."""
+    uri, mapping = atlas()
+    box = mapping[symbol_name(btype, hostile, **state)]
+    return (f'<span class="sym" style="background-image:url({uri});'
+            f'background-position:-{box["x"] // 2}px 0;"></span>')
+
+
 def points(xy, color, tips, radius, name, stroked=False, line_color=None):
     ll = to_lonlat(xy)
     data = [{"pos": [float(a), float(b)], "tip": tip} for (a, b), tip in zip(ll, tips)]
@@ -272,7 +321,7 @@ def labels(xy, texts, name, color=(28, 35, 33)):
     ll = to_lonlat(xy)
     data = [{"pos": [float(a), float(b)], "text": s, "tip": s} for (a, b), s in zip(ll, texts)]
     return pdk.Layer("TextLayer", data=data, id=name, get_position="pos", get_text="text",
-                     get_size=13, get_color=list(color), get_pixel_offset=[0, -17],
+                     get_size=13, get_color=list(color), get_pixel_offset=[0, -18],
                      font_family=String("sans-serif"), font_weight=700, background=True,
                      get_background_color=[255, 255, 255, 225], background_padding=[3, 1, 3, 1])
 
@@ -293,6 +342,8 @@ def legend(items):
     for c, txt, kind in items:
         if kind == "ring":
             sw = '<span class="ring"></span>'
+        elif kind == "sym":
+            sw = symbol_img(*c[0], **c[1])
         else:
             op = ";opacity:.35" if kind == "faint" else ""
             sw = f'<span class="swatch" style="background:rgb({c[0]},{c[1]},{c[2]}){op}"></span>'
@@ -338,15 +389,16 @@ with tab_ground:
                    ["Observation post"] * len(scen.op_nodes), 30, "op", stroked=True, line_color=OLIVE),
             points(scen.dismount_points(), [255, 255, 255, 220], ["Dismount point"] * 6, 14, "dis",
                    stroked=True, line_color=FRIEND),
-            points(scen.rpos, HOSTILE + [235],
-                   [f"{R_LABELS[j]} {TYPE_NAMES[RTYPE[j]]}{', in a building' if scen.r_building[j] else ''}"
-                    for j in range(NR)], 18, "red"),
-            labels(scen.rpos, R_LABELS, "red_lbl", HOSTILE),
+            *symbols([{"xy": scen.rpos[j], "btype": RTYPE[j], "hostile": True,
+                       "tip": f"{R_LABELS[j]} {TYPE_NAMES[RTYPE[j]]}"
+                              f"{', in a building' if scen.r_building[j] else ''}"}
+                      for j in range(NR)], "red"),
             labels(np.array([[0.0, 0.0]]), ["OBJ"], "obj"),
         ]
         st.pydeck_chart(make_deck(layers), height=620)
         legend([(FRIEND, "Blue routes (COA A)", "solid"), (OLIVE, "Support-by-fire and OP", "solid"),
-                (HOSTILE, "Red positions", "solid")])
+                (((R_AT, True), {}), "Red anti-tank team", "sym"),
+                (((R_INF, True), {}), "Red infantry", "sym")])
     with right:
         st.subheader(t.name or t.source)
         st.caption(t.source)
@@ -552,8 +604,11 @@ with tab_play:
     play = c3.button("Play", icon=":material/play_arrow:", width="stretch")
     st.caption("Both panels replay the same replication number. With shared random numbers, the runs "
                "match until the plans pull them apart, so the split shows where the plan changed the outcome.")
-    legend([(FRIEND, "Blue", "solid"), (HOSTILE, "Red, detected by Blue", "solid"),
-            (HOSTILE, "Red, not yet detected", "faint"), (DEAD, "Destroyed", "solid"),
+    legend([(((TANK, False), {}), "Tank", "sym"), (((IFV, False), {}), "IFV with infantry", "sym"),
+            (((INF, False), {}), "Infantry", "sym"), (((SCOUT, False), {}), "Scout", "sym"),
+            (((R_AT, True), {}), "Red anti-tank", "sym"), (((R_INF, True), {}), "Red infantry", "sym"),
+            (((R_AT, True), {"unseen": True}), "Not yet detected", "sym"),
+            (((INF, False), {"dead": True}), "Destroyed", "sym"),
             (FIRES, "Suppressed", "ring"), (FIRES, "Fire mission", "solid")])
 
     def events_by_rep(r):
@@ -578,22 +633,13 @@ with tab_play:
         for u in np.flatnonzero(present):
             kind = "IFV with infantry" if mounted[u] else TYPE_NAMES[BTYPE[u]]
             status = "destroyed" if not alive_b[u] else ("suppressed" if supp_b[u] else "fighting")
-            big = BTYPE[u] == TANK or mounted[u]
-            blue.append({"pos": to_lonlat(xy[u]).tolist(),
-                         "color": (FRIEND if alive_b[u] else DEAD) + [240 if alive_b[u] else 170],
-                         "edge": [255, 255, 255, 235] if alive_b[u] else [90, 90, 90, 160],
-                         "rad": (36 if big else 24) if alive_b[u] else 16,
-                         "tip": f"{B_LABELS[u]}: {kind}, {status}"})
+            blue.append({"xy": xy[u], "btype": IFV if mounted[u] else BTYPE[u], "hostile": False,
+                         "dead": not alive_b[u], "tip": f"{B_LABELS[u]}: {kind}, {status}"})
         red = []
         for j in range(NR):
             status = "destroyed" if not alive_r[j] else ("suppressed" if supp_r[j] else "fighting")
-            if not alive_r[j]:
-                col, edge, rad = DEAD + [170], [90, 90, 90, 160], 16
-            elif seen[j]:
-                col, edge, rad = HOSTILE + [245], [255, 255, 255, 235], 26
-            else:
-                col, edge, rad = HOSTILE + [40], HOSTILE + [220], 26
-            red.append({"pos": to_lonlat(scen.rpos[j]).tolist(), "color": col, "edge": edge, "rad": rad,
+            red.append({"xy": scen.rpos[j], "btype": RTYPE[j], "hostile": True,
+                        "dead": not alive_r[j], "unseen": not seen[j],
                         "tip": f"{R_LABELS[j]}: {TYPE_NAMES[RTYPE[j]]}, {status}"
                                f"{'' if seen[j] or not alive_r[j] else ', not yet detected'}"})
         rings = [{"pos": to_lonlat(xy[u]).tolist(), "tip": f"{B_LABELS[u]} suppressed"}
@@ -625,16 +671,12 @@ with tab_play:
             pdk.Layer("LineLayer", data=shots, id=f"shot{tag}", get_source_position="from",
                       get_target_position="to", get_color="color", get_width="w", width_units=String("pixels"),
                       pickable=True),
-            pdk.Layer("ScatterplotLayer", data=red, id=f"red{tag}", get_position="pos", get_radius="rad",
-                      get_fill_color="color", radius_min_pixels=6, pickable=True,
-                      stroked=True, get_line_color="edge", line_width_min_pixels=2),
-            pdk.Layer("ScatterplotLayer", data=blue, id=f"blue{tag}", get_position="pos", get_radius="rad",
-                      get_fill_color="color", radius_min_pixels=6, pickable=True,
-                      stroked=True, get_line_color="edge", line_width_min_pixels=2),
+            *symbols(red, f"red{tag}"),
+            *symbols(blue, f"blue{tag}"),
             pdk.Layer("ScatterplotLayer", data=rings, id=f"ring{tag}", get_position="pos", get_radius=42,
                       filled=False, stroked=True, get_line_color=FIRES, line_width_min_pixels=2),
             pdk.Layer("TextLayer", data=text, id=f"txt{tag}", get_position="pos", get_text="text",
-                      get_size=12, get_color=[28, 35, 33], get_pixel_offset=[0, -15],
+                      get_size=11, get_color=[28, 35, 33], get_pixel_offset=[17, -10],
                       font_family=String("sans-serif"), font_weight=700, background=True,
                       get_background_color=[255, 255, 255, 225], background_padding=[3, 1, 3, 1]),
         ]
