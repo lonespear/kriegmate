@@ -19,7 +19,7 @@ import numpy as np
 from .units import IFV, default_params
 
 TICK_S = 15                      # the tick length the parameters are stated for
-TICK_DEFAULT = 7.5               # the tick the engine runs at by default (see README, "Discretization")
+TICK_DEFAULT = 7.5               # the tick the engine runs at by default (see docs/technical-reference.md, "Discretization")
 RANGE_BANDS = np.array([500.0, 1000.0])   # edges of the shot/hit range bands
 STREAMS = ["det_b", "det_r", "choice_b", "choice_r", "ready_b", "ready_r", "hit_b", "hit_r",
            "kill_b", "kill_r", "supp_b", "supp_r", "mission", "mission_tgt", "mission_kill",

@@ -85,7 +85,7 @@ def make_roster(name, tanks, inf, scouts, at, rinf):
                   np.array([R_AT] * at + [R_INF] * rinf, int))
 
 
-# The four rungs of the calibration ladder (see README, "Calibration ladder")
+# The four rungs of the calibration ladder (see docs/technical-reference.md, "Calibration ladder")
 DUEL = make_roster("duel", 1, 0, 0, 1, 0)                 # rung 1: one tank vs one AT team
 SECTION = make_roster("section", 2, 2, 0, 1, 2)          # rung 2: tank section + 2 teams vs AT + 2 teams
 PLATOON = make_roster("platoon", 2, 4, 1, 2, 4)          # rung 3: platoon(+) vs reinforced squad

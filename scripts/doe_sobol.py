@@ -13,6 +13,7 @@ import sys
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from sim.manifest import code_version                 # noqa: E402
 from sim.doe import design, fit_metamodel, loo_r2, run_design, sobol_indices   # noqa: E402
 from sim.terrain import synthetic_terrain                                       # noqa: E402
 from sim.units import default_params                                            # noqa: E402
@@ -47,7 +48,8 @@ def main():
         for j in order:
             print(f"   {specs[j].name:16s} ST = {si['ST'][j]:.2f} ± {si['ST_se'][j]:.2f}   S = {si['S'][j]:.2f}")
     os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
-    json.dump(report, open(a.out, "w"), indent=1)
+    json.dump(dict(code_version=code_version(), args=vars(a), outputs=report),
+              open(a.out, "w"), indent=1)
     print(f"\nwrote {a.out}")
 
 
