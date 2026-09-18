@@ -1,0 +1,158 @@
+{
+ "script": "scripts/convergence.py",
+ "args": {
+  "reps": 1500,
+  "seed": 7,
+  "out": "runs/convergence.json"
+ },
+ "per_cell": [
+  {
+   "created": "2026-09-18T13:01:48+00:00",
+   "code_version": "git:325b74d",
+   "dirty_source": [],
+   "params_hash": "6dc2387fb8f9",
+   "seed": [
+    7
+   ],
+   "roster": "company",
+   "roster_blue": [
+    0,
+    0,
+    0,
+    0,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3
+   ],
+   "roster_red": [
+    4,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5
+   ],
+   "terrain": {
+    "source": "Synthetic",
+    "name": "Synthetic valley (offline)",
+    "lat0": 0.0,
+    "lon0": 0.0,
+    "half": 2000.0,
+    "cell": 25.0,
+    "fetched_at": "",
+    "surface_hash": "1b576053233f"
+   },
+   "versions": {
+    "python": "3.13.2",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1"
+   },
+   "scenario": {
+    "bearing_deg": 90.0,
+    "start_dist": 1700.0,
+    "sbf_min": 900.0,
+    "sbf_max": 1400.0,
+    "op_min": 1000.0,
+    "op_max": 1500.0,
+    "dismount_dist": 450.0,
+    "red_radius": 300.0,
+    "danger_close": 250.0,
+    "max_minutes": 60.0
+   },
+   "armor": "SBF",
+   "recon": true,
+   "fires": true,
+   "red_coa": "Late",
+   "reps": 1500,
+   "ticks_s": [
+    30.0,
+    15.0,
+    7.5,
+    3.75
+   ]
+  },
+  {
+   "created": "2026-09-18T13:02:53+00:00",
+   "code_version": "git:325b74d",
+   "dirty_source": [],
+   "params_hash": "6dc2387fb8f9",
+   "seed": [
+    7
+   ],
+   "roster": "company",
+   "roster_blue": [
+    0,
+    0,
+    0,
+    0,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3
+   ],
+   "roster_red": [
+    4,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5
+   ],
+   "terrain": {
+    "source": "Synthetic",
+    "name": "Synthetic valley (offline)",
+    "lat0": 0.0,
+    "lon0": 0.0,
+    "half": 2000.0,
+    "cell": 12.5,
+    "fetched_at": "",
+    "surface_hash": "1d2df63340a8"
+   },
+   "versions": {
+    "python": "3.13.2",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1"
+   },
+   "scenario": {
+    "bearing_deg": 90.0,
+    "start_dist": 1700.0,
+    "sbf_min": 900.0,
+    "sbf_max": 1400.0,
+    "op_min": 1000.0,
+    "op_max": 1500.0,
+    "dismount_dist": 450.0,
+    "red_radius": 300.0,
+    "danger_close": 250.0,
+    "max_minutes": 60.0
+   },
+   "armor": "SBF",
+   "recon": true,
+   "fires": true,
+   "red_coa": "Late",
+   "reps": 1500,
+   "ticks_s": [
+    30.0,
+    15.0,
+    7.5,
+    3.75
+   ]
+  }
+ ]
+}

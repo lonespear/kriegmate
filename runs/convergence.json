@@ -1,0 +1,250 @@
+{
+ "rows": [
+  {
+   "cell_m": 25.0,
+   "tick_s": 30.0,
+   "reps": 1500,
+   "p_win": 0.37266666666666665,
+   "p_win_lo": 0.3485522805859727,
+   "p_win_hi": 0.3974315811041001,
+   "blue_losses": 4.701333333333333,
+   "blue_losses_lo": 4.6133969930505305,
+   "blue_losses_hi": 4.789269673616136,
+   "minutes": 5.412
+  },
+  {
+   "cell_m": 25.0,
+   "tick_s": 15.0,
+   "reps": 1500,
+   "p_win": 0.5646666666666667,
+   "p_win_lo": 0.5394424916394175,
+   "p_win_hi": 0.5895604686541057,
+   "blue_losses": 3.8093333333333335,
+   "blue_losses_lo": 3.709931163735441,
+   "blue_losses_hi": 3.908735502931226,
+   "minutes": 4.902166666666667
+  },
+  {
+   "cell_m": 25.0,
+   "tick_s": 7.5,
+   "reps": 1500,
+   "p_win": 0.698,
+   "p_win_lo": 0.6742838890543356,
+   "p_win_hi": 0.7207045563804725,
+   "blue_losses": 3.112,
+   "blue_losses_lo": 3.011116032799932,
+   "blue_losses_hi": 3.212883967200068,
+   "minutes": 4.533916666666666
+  },
+  {
+   "cell_m": 25.0,
+   "tick_s": 3.75,
+   "reps": 1500,
+   "p_win": 0.702,
+   "p_win_lo": 0.6783616577999853,
+   "p_win_hi": 0.7246063521890614,
+   "blue_losses": 3.0233333333333334,
+   "blue_losses_lo": 2.9219847335941336,
+   "blue_losses_hi": 3.1246819330725333,
+   "minutes": 4.305791666666667
+  },
+  {
+   "cell_m": 12.5,
+   "tick_s": 30.0,
+   "reps": 1500,
+   "p_win": 0.236,
+   "p_win_lo": 0.2152027873027332,
+   "p_win_hi": 0.25814595211752256,
+   "blue_losses": 5.204,
+   "blue_losses_lo": 5.120637739410638,
+   "blue_losses_hi": 5.2873622605893615,
+   "minutes": 5.3933333333333335
+  },
+  {
+   "cell_m": 12.5,
+   "tick_s": 15.0,
+   "reps": 1500,
+   "p_win": 0.40066666666666667,
+   "p_win_lo": 0.37615213651116647,
+   "p_win_hi": 0.4256886770585762,
+   "blue_losses": 4.4093333333333335,
+   "blue_losses_lo": 4.312145488201464,
+   "blue_losses_hi": 4.506521178465203,
+   "minutes": 5.047
+  },
+  {
+   "cell_m": 12.5,
+   "tick_s": 7.5,
+   "reps": 1500,
+   "p_win": 0.5293333333333333,
+   "p_win_lo": 0.5040311294576545,
+   "p_win_hi": 0.5544856772734281,
+   "blue_losses": 3.8013333333333335,
+   "blue_losses_lo": 3.69822483222886,
+   "blue_losses_hi": 3.904441834437807,
+   "minutes": 4.697583333333333
+  },
+  {
+   "cell_m": 12.5,
+   "tick_s": 3.75,
+   "reps": 1500,
+   "p_win": 0.5673333333333334,
+   "p_win_lo": 0.5421202479163675,
+   "p_win_hi": 0.5922024220799814,
+   "blue_losses": 3.6026666666666665,
+   "blue_losses_lo": 3.498581940188338,
+   "blue_losses_hi": 3.706751393144995,
+   "minutes": 4.522125
+  }
+ ],
+ "manifests": [
+  {
+   "created": "2026-09-18T13:01:48+00:00",
+   "code_version": "git:325b74d",
+   "dirty_source": [],
+   "params_hash": "6dc2387fb8f9",
+   "seed": [
+    7
+   ],
+   "roster": "company",
+   "roster_blue": [
+    0,
+    0,
+    0,
+    0,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3
+   ],
+   "roster_red": [
+    4,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5
+   ],
+   "terrain": {
+    "source": "Synthetic",
+    "name": "Synthetic valley (offline)",
+    "lat0": 0.0,
+    "lon0": 0.0,
+    "half": 2000.0,
+    "cell": 25.0,
+    "fetched_at": "",
+    "surface_hash": "1b576053233f"
+   },
+   "versions": {
+    "python": "3.13.2",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1"
+   },
+   "scenario": {
+    "bearing_deg": 90.0,
+    "start_dist": 1700.0,
+    "sbf_min": 900.0,
+    "sbf_max": 1400.0,
+    "op_min": 1000.0,
+    "op_max": 1500.0,
+    "dismount_dist": 450.0,
+    "red_radius": 300.0,
+    "danger_close": 250.0,
+    "max_minutes": 60.0
+   },
+   "armor": "SBF",
+   "recon": true,
+   "fires": true,
+   "red_coa": "Late",
+   "reps": 1500,
+   "ticks_s": [
+    30.0,
+    15.0,
+    7.5,
+    3.75
+   ]
+  },
+  {
+   "created": "2026-09-18T13:02:53+00:00",
+   "code_version": "git:325b74d",
+   "dirty_source": [],
+   "params_hash": "6dc2387fb8f9",
+   "seed": [
+    7
+   ],
+   "roster": "company",
+   "roster_blue": [
+    0,
+    0,
+    0,
+    0,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3
+   ],
+   "roster_red": [
+    4,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5
+   ],
+   "terrain": {
+    "source": "Synthetic",
+    "name": "Synthetic valley (offline)",
+    "lat0": 0.0,
+    "lon0": 0.0,
+    "half": 2000.0,
+    "cell": 12.5,
+    "fetched_at": "",
+    "surface_hash": "1d2df63340a8"
+   },
+   "versions": {
+    "python": "3.13.2",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1"
+   },
+   "scenario": {
+    "bearing_deg": 90.0,
+    "start_dist": 1700.0,
+    "sbf_min": 900.0,
+    "sbf_max": 1400.0,
+    "op_min": 1000.0,
+    "op_max": 1500.0,
+    "dismount_dist": 450.0,
+    "red_radius": 300.0,
+    "danger_close": 250.0,
+    "max_minutes": 60.0
+   },
+   "armor": "SBF",
+   "recon": true,
+   "fires": true,
+   "red_coa": "Late",
+   "reps": 1500,
+   "ticks_s": [
+    30.0,
+    15.0,
+    7.5,
+    3.75
+   ]
+  }
+ ]
+}
