@@ -170,7 +170,7 @@ with st.sidebar:
                              "instead of conditioning on one. The map and replay show the first plan.")
     tick_s = st.select_slider("Time step (s)", [3.75, 7.5, 15.0], TICK_DEFAULT,
                               help="7.5 s is the converged default; 15 s runs twice as fast but is not converged "
-                                   "(see README, Discretization).")
+                                   "(see docs/technical-reference.md, Discretization).")
     n_log = st.slider("Replays kept per COA", 5, 50, 20, 5)
     seed = int(st.number_input("Seed", 0, 1_000_000, 2026))
     run_clicked = st.button("Run both COAs", type="primary", width="stretch")
@@ -220,10 +220,35 @@ def to_lonlat(xy):
     return np.stack([lon, lat], -1)
 
 
+def focus_box():
+    """The ground the fight actually uses, so the map opens on the action rather than on the
+    whole tile. Returns (centre x, centre y, half-width m), clamped to the loaded ground."""
+    if scen is None:
+        return 0.0, 0.0, t.half
+    pts = [scen.rpos, np.atleast_2d(scen.dismount_points()),
+           np.array([scen._xy(nd) for nd in list(scen.sbf_nodes) + list(scen.op_nodes)] or [[0.0, 0.0]])]
+    pts += [np.asarray(xy) for xy in scen.routes_xy(coa_a[0])]
+    p = np.concatenate([np.atleast_2d(a) for a in pts if len(a)])
+    lo, hi = p.min(0), p.max(0)
+    cx, cy = (lo + hi) / 2
+    half = max(float(np.max(hi - lo)) / 2 * 1.22, 400.0)
+    half = min(half, t.half)
+    cx = float(np.clip(cx, -(t.half - half), t.half - half))
+    cy = float(np.clip(cy, -(t.half - half), t.half - half))
+    return cx, cy, half
+
+
+# the narrowest map pane (a playback panel) is about this wide, so fitting to it keeps the whole
+# fight on screen in every panel; the Ground map simply gets a little air around it
+PANE_PX = 430
+
+
 def view_state():
-    mpp = 2 * t.half / 760
-    zoom = math.log2(156543.03 * math.cos(math.radians(t.lat0)) / mpp) - 0.15
-    return pdk.ViewState(latitude=t.lat0, longitude=t.lon0, zoom=zoom, pitch=0)
+    cx, cy, half = focus_box()
+    mpp = 2 * half / PANE_PX
+    zoom = math.log2(156543.03 * math.cos(math.radians(t.lat0)) / mpp)
+    lon, lat = t.xy_to_lonlat(np.array([cx]), np.array([cy]))
+    return pdk.ViewState(latitude=float(lat[0]), longitude=float(lon[0]), zoom=zoom, pitch=0)
 
 
 def make_deck(layers):

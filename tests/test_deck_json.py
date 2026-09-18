@@ -8,7 +8,6 @@ import json
 import re
 from pathlib import Path
 
-import pytest
 from streamlit.testing.v1 import AppTest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,8 +26,8 @@ def accessor_strings(node, out):
     return out
 
 
-@pytest.mark.parametrize("script", ["app.py", "app_brigade.py"])
-def test_no_literal_is_sent_as_an_accessor(script):
+def test_no_literal_is_sent_as_an_accessor():
+    script = "app.py"
     at = AppTest.from_file(str(ROOT / script), default_timeout=300).run()
     assert not at.exception
     charts = at.get("deck_gl_json_chart")

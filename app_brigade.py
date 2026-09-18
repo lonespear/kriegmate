@@ -13,7 +13,7 @@ from sim.nations import CLASSES, NATIONS
 st.set_page_config(page_title="Brigade COA game", layout="wide")
 st.title("Brigade against brigade")
 st.caption("Company-level aggregate engine driven by the same kernels as the entity model. All equipment "
-           "and force-structure numbers are notional placeholders; see README section 19 and sim/nations.py.")
+           "and force-structure numbers are notional placeholders; see docs/technical-reference.md section 19 and sim/nations.py.")
 
 with st.sidebar:
     st.header("Forces")
