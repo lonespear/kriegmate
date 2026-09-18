@@ -1,3 +1,5 @@
+# Lower bounds for installation. The exact versions the committed results in runs/ were
+# produced with are in requirements-lock.txt (see docs/technical-reference.md, Reproducibility).
 streamlit>=1.50
 pydeck>=0.9
 altair>=5

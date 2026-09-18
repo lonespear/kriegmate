@@ -1,0 +1,13 @@
+# Exact versions used to produce the committed artifacts in runs/ (Python 3.13, Windows).
+# Install with: pip install -r requirements-lock.txt
+altair==5.5.0
+matplotlib==3.11.2
+numpy==2.5.3
+pandas==2.3.3
+pillow==11.3.0
+pydeck==0.9.3
+pytest==9.1.1
+requests==2.34.2
+scikit-learn==1.9.1
+scipy==1.18.1
+streamlit==1.64.0
