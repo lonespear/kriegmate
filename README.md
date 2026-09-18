@@ -163,10 +163,12 @@ Monte Carlo noise floor, Saltelli sampling with Jansen's estimators). Committed 
 | Red loss fraction | 0.86 | 0.04 | `pk_at_tank` 0.74 ± 0.02 | `theta0_at` 0.17 |
 | minutes to decision | 0.75 | 0.05 | `pk_at_tank` 0.61 ± 0.02 | `theta0_at` 0.28 |
 
-The **trust rule is enforced in code**: indices are reported as trustworthy only when
-LOO R² > 0.7. At rung 2 with 200 replications the noise share rises to ≈0.7 and LOO R² falls
-near zero, and the tool refuses to certify the indices rather than printing them. That refusal
-is the point of the machinery.
+The **trust rule is enforced in code**: `doe_sobol.py` prints
+`(metamodel too noisy: indices are indicative only)` next to any output whose LOO R² is below
+0.7, so an untrustworthy index cannot be quoted without the warning attached. At rung 2 with 200
+replications the noise share rises to ≈0.7 and LOO R² falls near zero, and every output is
+flagged. That refusal to certify is the point of the machinery.
+(Rung-2 figures **not committed**; regenerate with `python scripts/doe_sobol.py --rung 2 --reps 200`.)
 
 Reading: one parameter — the AT team's probability of killing a tank — carries most of the
 variance in every outcome at this rung. If this model were ever to be calibrated against data,

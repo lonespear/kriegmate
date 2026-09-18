@@ -611,8 +611,10 @@ Estimators and the GP formulation are in Appendix A.16–A.17.
 3. `fit_metamodel(U, y, v)`: an anisotropic-RBF Gaussian process with a white-noise term whose
    floor is the mean Monte Carlo variance (stochastic-kriging style), so the GP does not fit
    noise. `Metamodel.noise_share` is MC variance / total output variance at the design points.
-4. `loo_r2`: leave-one-out R². **Trust rule:** indices are reported as trustworthy only when
-   LOO R² > 0.7. Below that, raise `--reps` (less noise) or `--design` (more points).
+4. `loo_r2`: leave-one-out R². **Trust rule:** `doe_sobol.py` prints
+   `(metamodel too noisy: indices are indicative only)` next to any output whose LOO R² is
+   below 0.7, so an untrustworthy index cannot be quoted without its warning. Below that
+   threshold, raise `--reps` (less noise) or `--design` (more points).
 5. `sobol_indices(model, d, N)`: first-order and total-effect indices by the Saltelli scheme
    with Jansen's estimators (Saltelli et al. 2010) on scrambled Sobol samples, with bootstrap
    standard errors.
