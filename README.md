@@ -68,7 +68,9 @@ identical draws for every mechanic they share.
 The **aggregate brigade engine** (`sim/brigade.py`) fights brigades of four notional nations on a
 30 km box. It is derived as a **mean-field (Poisson-thinned) limit of the same kill chain**
 (see [Appendix A.19](docs/appendix-a-methodology.md)), then bias-corrected against the entity
-engine (rung 5, below). It is not Lanchester either.
+engine (rung 5, below). It is not Lanchester either. Its results are in
+[technical reference §19.4](docs/technical-reference.md#194-what-it-shows), every rate with a
+Wilson interval and a replication count, from `runs/brigade_table.json`.
 
 ---
 
@@ -291,8 +293,9 @@ Every method below is implemented, unit-tested, and derived in
   what alternatives available).
 - The history-matching NROY box is axis-aligned, so correlated parameter constraints are captured
   only by the samples inside it, not by the box.
-- Brigade results rest on 100 replications per pairing; the Wilson intervals are wide
-  (roughly ±0.10 on a rate near 0.5) and the table separates only large effects.
+- Brigade results rest on **20 replications per pairing** (`runs/brigade_table.json`). A rate
+  near 0.5 then carries a Wilson interval about 0.40 wide, so the table separates 2:1 from 1:1
+  and nothing finer. Raising it to 100 takes about an hour of CPU.
 
 **Public release.** The adversary-nation force templates and command-and-control profiles in
 `sim/nations.py` and `sim/c2.py` are invented for methodological demonstration and labelled as

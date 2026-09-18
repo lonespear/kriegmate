@@ -1045,23 +1045,47 @@ Runtime: 0.3–2 s per replication on a laptop depending on how long the fight r
 
 ### 19.4 What it shows
 
-Synthetic ground (seed 1), full brigade combat teams, corrected kill rates (19.7), 20 replications:
+`python scripts/brigade_table.py --reps 20` on synthetic ground (terrain seed 1, run seed 0),
+full brigade combat teams, two-up vs forward, corrected kill rates (19.7). Generated at commit
+`a475843` and committed as `runs/brigade_table.json`, which also carries losses by class and the
+initial count of every class.
 
-| Pairing (two-up vs forward) | P(objective seized) | attacker / defender maneuver losses | minutes |
-|---|---|---|---|
-| US ×1 → RU | 0.00 | 0.26 / 0.15 | 66 |
-| US ×2 → RU | 0.70 | 0.19 / 0.28 | 85 |
-| RU ×1 → US | 0.05 | 0.28 / 0.14 | 135 |
-| RU ×2 → US | 0.80 | 0.22 / 0.33 | 175 |
-| CN ×1 → IR | 0.55 | 0.16 / 0.32 | 101 |
-| IR ×2 → CN | 0.00, 55% censored | 0.32 / 0.19 | 411 |
+**20 replications is a small sample and the intervals say so**; a rate near 0.5 carries a Wilson
+interval about 0.40 wide. The table separates 2:1 from 1:1 and nothing finer. Raising `--reps`
+to 100 takes roughly 60 minutes of CPU for the six pairings.
 
-Force ratio dominates at equal quality. Enabler effects are visible in the class-level losses:
-Iran's Cobra pair does not survive eight hours against Chinese air defence (1.95 of 2 lost per
-fight); Russian obstacle belts (36 cells from 20 engineer vehicles at 85% readiness) cost the US
-attack roughly 15 minutes and 4% of the vehicles that hit them; the Russian defender against
-US ×2 ends with 470 rounds of a 5400-round stock after the support battalion is hit. The scheme
-game only discriminates schemes near even odds; at 2:1 the cells saturate.
+| Pairing (two-up vs forward) | n | P(objective seized) [95% Wilson] | attacker maneuver losses [95%] | defender maneuver losses [95%] | minutes [95%] | censored |
+|---|---|---|---|---|---|---|
+| US x1 -> RU x1 | 20 | 0.000 [0.000, 0.161] | 0.265 [0.240, 0.291] | 0.138 [0.111, 0.166] | 75 [61, 89] | 0.00 |
+| US x2 -> RU x1 | 20 | 0.700 [0.481, 0.855] | 0.222 [0.204, 0.240] | 0.325 [0.298, 0.352] | 131 [110, 152] | 0.00 |
+| RU x1 -> US x1 | 20 | 0.000 [0.000, 0.161] | 0.285 [0.260, 0.309] | 0.128 [0.110, 0.145] | 159 [132, 185] | 0.00 |
+| RU x2 -> US x1 | 20 | 0.800 [0.584, 0.919] | 0.163 [0.143, 0.182] | 0.312 [0.276, 0.348] | 248 [207, 290] | 0.00 |
+| CN x1 -> IR x1 | 20 | 0.500 [0.299, 0.701] | 0.170 [0.142, 0.198] | 0.304 [0.265, 0.343] | 106 [79, 133] | 0.00 |
+| IR x2 -> CN x1 | 20 | 0.000 [0.000, 0.161] | 0.303 [0.276, 0.331] | 0.100 [0.086, 0.114] | 408 [363, 454] | 0.40 |
+
+**What the intervals support.**
+
+- *Force ratio, holding both nations fixed.* Doubling the attacker moves P(seized) from
+  0.000 [0.000, 0.161] to 0.700 [0.481, 0.855] for US -> RU, and from 0.000 [0.000, 0.161] to
+  0.800 [0.584, 0.919] for RU -> US. Both gaps are far outside their intervals. This is a
+  controlled comparison: only the number of attacking brigades changes.
+- *Force ratio is not sufficient.* IR x2 -> CN seizes the objective in 0 of 20 at the same 2:1
+  ratio, with 40% of fights censored at the eight-hour limit. Quality, enablers and defender
+  air defence are doing work that the ratio alone does not capture.
+- *Attack aviation attrites heavily where the defender has dense SHORAD.* Iran loses
+  2.1 of 4 attack helicopters per fight against China (n = 20, `runs/brigade_table.json`),
+  against 0.1 of 2 for the US against Russia.
+
+**Deleted for lack of evidence (2026-09-18).** The previous version of this section claimed
+"force ratio dominates at equal quality" - the nations in the table differ in quality, so that
+comparison was never run. It also reported that Iran's Cobra pair "does not survive eight hours
+against Chinese air defence (1.95 of 2 lost per fight)"; the regenerated run loses 2.1 of 4, or
+about half, not nearly all. Two further claims - that Russian obstacle belts cost the US attack
+"roughly 15 minutes and 4% of the vehicles that hit them", and that the Russian defender ends
+with 470 of 5400 rounds - came from runs that were not kept, and the first needs an
+obstacles-on/obstacles-off comparison that this script does not run. All four have been removed
+rather than softened. The claim that the scheme game "only discriminates schemes near even odds"
+needs `scripts/brigade_game.py`, which was not rerun; regenerate it before restating it.
 
 ### 19.5 App (`app_brigade.py`)
 
