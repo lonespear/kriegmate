@@ -164,8 +164,7 @@ def rasterize_coarse(t: BrigadeTerrain, elements, fine_cell=100.0):
 
 
 def fetch_osm_coarse(t, timeout=120):
-    import requests
-    from .terrain import OVERPASS_URLS, USER_AGENT
+    from .terrain import overpass_query
     w, s_, e, n_ = t.bounds_lonlat()
     bb = f"{s_},{w},{n_},{e}"
     q = f"""[out:json][timeout:90];
@@ -174,15 +173,7 @@ def fetch_osm_coarse(t, timeout=120):
  way["waterway"~"^(riverbank|river|canal)$"]({bb});
  way["highway"~"^(motorway|trunk|primary|secondary|tertiary)$"]({bb}););
 out tags geom;"""
-    last = None
-    for url in OVERPASS_URLS:
-        try:
-            r = requests.post(url, data={"data": q}, headers={"User-Agent": USER_AGENT}, timeout=timeout)
-            r.raise_for_status()
-            return r.json()["elements"]
-        except Exception as ex:
-            last = ex
-    raise RuntimeError(f"OpenStreetMap request failed on every Overpass mirror: {last}")
+    return overpass_query(q, timeout)
 
 
 def osm_brigade_terrain(lat0, lon0, half=15000.0, cell=300.0, name=""):

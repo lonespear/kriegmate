@@ -27,7 +27,7 @@ HOSTILE = [194, 59, 34]
 FIRES = [217, 154, 0]
 OLIVE = [94, 107, 50]
 DEAD = [128, 128, 128]
-CLASS_RGB = np.array([[226, 229, 214], [250, 250, 244], [118, 148, 92], [92, 92, 104], [110, 160, 200]])
+CLASS_RGB = np.array([[229, 231, 218], [249, 248, 241], [150, 176, 126], [178, 176, 183], [140, 183, 214]])
 ARMOR = {"SBF": "Armor supports by fire", "Maneuver": "Armor maneuvers with infantry",
          "Unsupported": "Armor attacks alone"}
 RED_COA = {"Early": "Engage at maximum range", "Late": "Hold fire until trigger range"}
@@ -70,8 +70,8 @@ def terrain_png(_t, version):
     aspect = np.arctan2(-gx, gy)
     az, alt_ = np.radians(315), np.radians(45)
     shade = np.clip(np.sin(alt_) * np.cos(slope) + np.cos(alt_) * np.sin(slope) * np.cos(az - aspect), 0, 1)
-    rgb = CLASS_RGB[_t.cls] * (0.55 + 0.45 * shade[..., None])
-    img = np.dstack([np.clip(rgb, 0, 255), np.full(_t.cls.shape, 215)]).astype(np.uint8)[::-1]
+    rgb = CLASS_RGB[_t.cls] * (0.72 + 0.28 * shade[..., None])
+    img = np.dstack([np.clip(rgb, 0, 255), np.full(_t.cls.shape, 190)]).astype(np.uint8)[::-1]
     buf = io.BytesIO()
     Image.fromarray(img, "RGBA").save(buf, format="PNG")
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
@@ -222,7 +222,7 @@ def to_lonlat(xy):
 
 def view_state():
     mpp = 2 * t.half / 760
-    zoom = math.log2(156543.03 * math.cos(math.radians(t.lat0)) / mpp)
+    zoom = math.log2(156543.03 * math.cos(math.radians(t.lat0)) / mpp) - 0.15
     return pdk.ViewState(latitude=t.lat0, longitude=t.lon0, zoom=zoom, pitch=0)
 
 
@@ -238,17 +238,18 @@ def points(xy, color, tips, radius, name, stroked=False, line_color=None):
     ll = to_lonlat(xy)
     data = [{"pos": [float(a), float(b)], "tip": tip} for (a, b), tip in zip(ll, tips)]
     return pdk.Layer("ScatterplotLayer", data=data, id=name, get_position="pos",
-                     get_fill_color=color, get_radius=radius, radius_min_pixels=4, pickable=True,
-                     stroked=stroked, filled=not stroked or line_color is None,
-                     get_line_color=line_color or [30, 30, 30], line_width_min_pixels=1.5)
+                     get_fill_color=color, get_radius=radius, radius_min_pixels=6, pickable=True,
+                     stroked=True, filled=not stroked or line_color is None,
+                     get_line_color=line_color or [255, 255, 255], line_width_min_pixels=2)
 
 
 def labels(xy, texts, name, color=(28, 35, 33)):
     ll = to_lonlat(xy)
     data = [{"pos": [float(a), float(b)], "text": s, "tip": s} for (a, b), s in zip(ll, texts)]
     return pdk.Layer("TextLayer", data=data, id=name, get_position="pos", get_text="text",
-                     get_size=13, get_color=list(color), get_pixel_offset=[0, -16],
-                     font_family="Barlow Condensed, Barlow, sans-serif", font_weight=600)
+                     get_size=13, get_color=list(color), get_pixel_offset=[0, -17],
+                     font_family=String("sans-serif"), font_weight=700, background=True,
+                     get_background_color=[255, 255, 255, 225], background_padding=[3, 1, 3, 1])
 
 
 def coa_label(coa):
@@ -552,15 +553,22 @@ with tab_play:
         for u in np.flatnonzero(present):
             kind = "IFV with infantry" if mounted[u] else TYPE_NAMES[BTYPE[u]]
             status = "destroyed" if not alive_b[u] else ("suppressed" if supp_b[u] else "fighting")
+            big = BTYPE[u] == TANK or mounted[u]
             blue.append({"pos": to_lonlat(xy[u]).tolist(),
-                         "color": (FRIEND if alive_b[u] else DEAD) + [240],
-                         "rad": 30 if (BTYPE[u] == TANK or mounted[u]) else 18,
+                         "color": (FRIEND if alive_b[u] else DEAD) + [240 if alive_b[u] else 170],
+                         "edge": [255, 255, 255, 235] if alive_b[u] else [90, 90, 90, 160],
+                         "rad": (36 if big else 24) if alive_b[u] else 16,
                          "tip": f"{B_LABELS[u]}: {kind}, {status}"})
         red = []
         for j in range(NR):
             status = "destroyed" if not alive_r[j] else ("suppressed" if supp_r[j] else "fighting")
-            col = DEAD + [230] if not alive_r[j] else HOSTILE + ([240] if seen[j] else [90])
-            red.append({"pos": to_lonlat(scen.rpos[j]).tolist(), "color": col, "rad": 20,
+            if not alive_r[j]:
+                col, edge, rad = DEAD + [170], [90, 90, 90, 160], 16
+            elif seen[j]:
+                col, edge, rad = HOSTILE + [245], [255, 255, 255, 235], 26
+            else:
+                col, edge, rad = HOSTILE + [40], HOSTILE + [220], 26
+            red.append({"pos": to_lonlat(scen.rpos[j]).tolist(), "color": col, "edge": edge, "rad": rad,
                         "tip": f"{R_LABELS[j]}: {TYPE_NAMES[RTYPE[j]]}, {status}"
                                f"{'' if seen[j] or not alive_r[j] else ', not yet detected'}"})
         rings = [{"pos": to_lonlat(xy[u]).tolist(), "tip": f"{B_LABELS[u]} suppressed"}
@@ -590,19 +598,20 @@ with tab_play:
                       get_fill_color=FIRES + [120], stroked=True, get_line_color=FIRES,
                       line_width_min_pixels=2, pickable=True),
             pdk.Layer("LineLayer", data=shots, id=f"shot{tag}", get_source_position="from",
-                      get_target_position="to", get_color="color", get_width="w", width_units="pixels",
+                      get_target_position="to", get_color="color", get_width="w", width_units=String("pixels"),
                       pickable=True),
             pdk.Layer("ScatterplotLayer", data=red, id=f"red{tag}", get_position="pos", get_radius="rad",
-                      get_fill_color="color", radius_min_pixels=4, pickable=True,
-                      stroked=True, get_line_color=[255, 255, 255], line_width_min_pixels=1),
+                      get_fill_color="color", radius_min_pixels=6, pickable=True,
+                      stroked=True, get_line_color="edge", line_width_min_pixels=2),
             pdk.Layer("ScatterplotLayer", data=blue, id=f"blue{tag}", get_position="pos", get_radius="rad",
-                      get_fill_color="color", radius_min_pixels=4, pickable=True,
-                      stroked=True, get_line_color=[255, 255, 255], line_width_min_pixels=1),
+                      get_fill_color="color", radius_min_pixels=6, pickable=True,
+                      stroked=True, get_line_color="edge", line_width_min_pixels=2),
             pdk.Layer("ScatterplotLayer", data=rings, id=f"ring{tag}", get_position="pos", get_radius=42,
                       filled=False, stroked=True, get_line_color=FIRES, line_width_min_pixels=2),
             pdk.Layer("TextLayer", data=text, id=f"txt{tag}", get_position="pos", get_text="text",
-                      get_size=12, get_color=[28, 35, 33], get_pixel_offset=[0, -14],
-                      font_family="Barlow Condensed, Barlow, sans-serif", font_weight=600),
+                      get_size=12, get_color=[28, 35, 33], get_pixel_offset=[0, -15],
+                      font_family=String("sans-serif"), font_weight=700, background=True,
+                      get_background_color=[255, 255, 255, 225], background_padding=[3, 1, 3, 1]),
         ]
 
     def feed_html(r, tag, i, tt):

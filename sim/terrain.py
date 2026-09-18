@@ -25,7 +25,8 @@ USER_AGENT = "adversarial-mc-sim/0.1 (educational wargaming model)"
 M_PER_DEG_LAT = 110_540.0
 M_PER_DEG_LON_EQ = 111_320.0
 OVERPASS_URLS = ["https://overpass-api.de/api/interpreter",
-                 "https://overpass.kumi.systems/api/interpreter"]
+                 "https://overpass.kumi.systems/api/interpreter",
+                 "https://overpass.private.coffee/api/interpreter"]
 ROAD_WIDTH = {"motorway": 24, "trunk": 20, "primary": 14, "secondary": 12, "tertiary": 10}
 SKIP_HIGHWAY = {"footway", "path", "steps", "cycleway", "bridleway", "pedestrian",
                 "corridor", "proposed", "construction", "elevator", "platform"}
@@ -223,7 +224,6 @@ def geocode(query, timeout=20):
 
 
 def fetch_osm(t, timeout=90):
-    import requests
     w, s, e, n = t.bounds_lonlat()
     bb = f"{s},{w},{n},{e}"
     q = f"""[out:json][timeout:60];
@@ -233,14 +233,34 @@ def fetch_osm(t, timeout=90):
  way["waterway"~"^(riverbank|river|canal)$"]({bb});
  way["highway"]({bb}););
 out tags geom;"""
+    return overpass_query(q, timeout)
+
+
+def overpass_query(q, timeout=90):
+    """Send an Overpass query to every mirror at once and return the first successful answer.
+
+    Public mirrors swing between seconds and timeouts from one request to the next, so racing
+    them costs little and avoids waiting out a slow mirror before trying the next.
+    """
+    import concurrent.futures as cf
+    import requests
+
+    def post(url):
+        r = requests.post(url, data={"data": q}, headers={"User-Agent": USER_AGENT}, timeout=timeout)
+        r.raise_for_status()
+        return r.json()["elements"]
+
+    pool = cf.ThreadPoolExecutor(len(OVERPASS_URLS))
+    futures = [pool.submit(post, url) for url in OVERPASS_URLS]
     last = None
-    for url in OVERPASS_URLS:
-        try:
-            r = requests.post(url, data={"data": q}, headers={"User-Agent": USER_AGENT}, timeout=timeout)
-            r.raise_for_status()
-            return r.json()["elements"]
-        except Exception as ex:  # try the next mirror
-            last = ex
+    try:
+        for f in cf.as_completed(futures):
+            try:
+                return f.result()
+            except Exception as ex:  # wait for the other mirrors
+                last = ex
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
     raise RuntimeError(f"OpenStreetMap request failed on every Overpass mirror: {last}")
 
 
