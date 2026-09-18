@@ -31,12 +31,18 @@ def main():
     ap.add_argument("--terrain-seed", type=int, default=1)
     ap.add_argument("--att-coa", default="two_up")
     ap.add_argument("--def-coa", default="forward")
+    ap.add_argument("--only", type=int, nargs="*", default=None,
+                    help="indices into PAIRINGS to run (default: all); merges into an existing --out")
     ap.add_argument("--out", default="runs/brigade_table.json")
     a = ap.parse_args()
 
     t = synthetic_brigade_terrain(seed=a.terrain_seed)
+    todo = PAIRINGS if a.only is None else [PAIRINGS[i] for i in a.only]
     rows = []
-    for att, nb, dfd, ndb in PAIRINGS:
+    if a.only is not None and os.path.exists(a.out):
+        rows = [r for r in json.load(open(a.out))["rows"]
+                if (r["attacker"], r["att_bdes"], r["defender"], r["def_bdes"]) not in todo]
+    for att, nb, dfd, ndb in todo:
         sim = BrigadeSim(t, NATIONS[att], NATIONS[dfd], a.att_coa, a.def_coa,
                          att_bdes=nb, def_bdes=ndb)
         r = sim.run(a.reps, seed=a.seed, n_log=0)
@@ -63,6 +69,8 @@ def main():
               f"censored {row['censored_frac']:.2f}")
 
     os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
+    key = {p: i for i, p in enumerate(PAIRINGS)}
+    rows.sort(key=lambda r: key[(r["attacker"], r["att_bdes"], r["defender"], r["def_bdes"])])
     json.dump(dict(code_version=code_version(), args=vars(a), terrain="synthetic_brigade_terrain",
                    rows=rows), open(a.out, "w"), indent=1)
     print(f"wrote {a.out}")

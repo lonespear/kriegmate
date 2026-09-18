@@ -247,7 +247,8 @@ Every method below is implemented, unit-tested, and derived in
 | Latin hypercube design + stochastic-kriging GP | `sim/doe.py` | a metamodel that fits signal, not Monte Carlo noise |
 | Saltelli/Jansen Sobol indices with a LOO R² > 0.7 trust rule | `doe.sobol_indices` | which parameter to measure first — and a refusal when the data cannot say |
 | History matching: implausibility, NROY waves, held-out terrain coverage | `sim/calibrate.py` | a calibration procedure that reports what it cannot identify |
-| Zero-sum LP game value with a bootstrap interval | `stats.solve_zero_sum` | a Red-plan outer loop, so selection is not conditional on one defense |
+| Zero-sum LP game value with a bootstrap interval | `stats.solve_zero_sum`, `bootstrap_game_value` | a scheme-vs-scheme game value with an interval, not one COA pair |
+| Red-plan outer loop over sampled defenses | `sim/scenario.py`, `scripts/compare_coas.py` | selection that is not conditional on one Red plan |
 | Run manifests: git SHA, parameter hash, terrain hash, library versions | `sim/manifest.py` | any table can be traced to the code that made it |
 
 ---

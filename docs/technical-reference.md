@@ -1165,8 +1165,9 @@ parameters: Latin hypercube over the five factors of one side across `C2_RANGES`
 p_init 0.1–0.95, latitude 0.1–1, net 0.4–1, sync 0.3–1), GP with the Monte Carlo noise floor,
 Saltelli/Jansen indices on P(objective seized). Report C2 claims as "τ moves P(win) by X over
 its range" rather than "Russia loses because of its NCOs." A demonstration run (US attacker vs RU,
-16 design points × 12 replications, about 10 minutes) spanned P(win) 0.33–0.75 across the
-design but its metamodel had LOO R² below zero with a Monte Carlo noise share of 1.0, so the
+16 design points × 12 replications, about 10 minutes; **not committed** — regenerate with
+`python scripts/c2_sensitivity.py --attacker US --defender RU`) spanned P(win) 0.33–0.75 across
+the design but its metamodel had LOO R² below zero with a Monte Carlo noise share of 1.0, so the
 tool refused to certify its indices (the raw ranking put `sync` first, `tau` second). That is
 the correct behaviour: a study that can support a claim about C2 needs roughly 40 points ×
 100 replications (about 3 hours at current speed). Do not quote the demonstration indices.
